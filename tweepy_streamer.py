@@ -18,7 +18,6 @@ class StdOutListener(StreamListener):
 
     def on_data(self, data):
         logger.info(data)
-        print('added')
         return True
 
     def on_error(self, status):
