@@ -41,6 +41,8 @@ stream = Stream(auth, listener)
 
 try:
     stream.filter(track=[sys.argv[1]])
+except KeyboardInterrupt:
+    os.system('pkill -9 python')
 except BaseException as e:
     print(e.message)
     os.system('pkill -9 python')

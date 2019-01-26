@@ -4,15 +4,29 @@ import subprocess
 import time
 from collections import Counter, OrderedDict
 from urllib.parse import urlparse
+
+import nltk
 import requests
 import validators
 
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
-
 def process_tweet(tweet):
     words = tweet.split()
-    words = [i for i in words if validators.url(i)]
+    words = nltk.pos_tag(words)
+    words = [i[0] for i in words if (i[1] not in ('PRP', 'PRP$', 'TO', 'IN', 'CC', 'DT'))]
+    tokens = words.copy()
+    words2 = []
+    words = []
+    for i in tokens:
+        if validators.url(i):
+            words.append(i)
+        else:
+            words2.append(i)
+    words2_length = len(set(words2))
+    words2_dict = dict(Counter(words2))
+    words2_dict = OrderedDict(sorted(words2_dict.items(), key=lambda x: x[1], reverse=True)).items()
+    words2_dict = list(words2_dict)[:10]
     url_count = len(words)
     try:
         domains = [urlparse(requests.head(
@@ -25,8 +39,8 @@ def process_tweet(tweet):
         sorted(domains.items(), key=lambda x: x[1], reverse=True)).items()
     domains = list(domains)
     if len(domains) == 0:
-        domains = ""
-    return url_count, domains
+        domains = "No_URLs"
+    return url_count, domains, words2_length, words2_dict
 
 
 while True:
@@ -48,11 +62,11 @@ while True:
             tweet_string = i[1]
             i.extend(process_tweet(tweet_string))
         print(
-            'User - No._of_tweets_in_last_5_min - No._of_links_in_tweets - Order_of_resolved_domains_sorted_by_count_descending')
+            'User - No._of_tweets_in_last_5_min - No._of_links_in_tweets - Order_of_resolved_domains_sorted_by_count_descending - Total_no._of_unique_words_in_tweet - Top_10_occurring_words')
         for i in items:
             print(i[0].ljust(15)+' - ', ' - '.join([str(j) for j in i[2:]]))
         print(len(items))
-        print('#'*140)
+        print('#'*145)
     except KeyboardInterrupt:
         os.system('pkill -9 python')
     except BaseException as e:
