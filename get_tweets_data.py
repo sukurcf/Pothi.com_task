@@ -6,9 +6,9 @@ nltk.download('averaged_perceptron_tagger')
 
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 keyword = input('Enter keyword: ')
-print('---------------------------Starting------------------------------')
+print('Started'.center(100, '*'))
 try:
     os.system(
         'python tweets_metrics.py & python tweepy_streamer.py {}'.format(keyword))
-except:
+except KeyboardInterrupt:
     os.system('pkill -9 python')

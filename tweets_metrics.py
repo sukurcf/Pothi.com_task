@@ -11,10 +11,12 @@ import validators
 
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
+
 def process_tweet(tweet):
     words = tweet.split()
     words = nltk.pos_tag(words)
-    words = [i[0] for i in words if (i[1] not in ('PRP', 'PRP$', 'TO', 'IN', 'CC', 'DT'))]
+    words = [i[0] for i in words if (i[1] not in (
+        'PRP', 'PRP$', 'TO', 'IN', 'CC', 'DT'))]
     tokens = words.copy()
     words2 = []
     words = []
@@ -25,7 +27,8 @@ def process_tweet(tweet):
             words2.append(i)
     words2_length = len(set(words2))
     words2_dict = dict(Counter(words2))
-    words2_dict = OrderedDict(sorted(words2_dict.items(), key=lambda x: x[1], reverse=True)).items()
+    words2_dict = OrderedDict(
+        sorted(words2_dict.items(), key=lambda x: x[1], reverse=True)).items()
     words2_dict = list(words2_dict)[:10]
     url_count = len(words)
     try:
@@ -61,11 +64,14 @@ while True:
         for i in items:
             tweet_string = i[1]
             i.extend(process_tweet(tweet_string))
+        print('-' * 145)
         print(
-            'User - No._of_tweets_in_last_5_min - No._of_links_in_tweets - Order_of_resolved_domains_sorted_by_count_descending - Total_no._of_unique_words_in_tweet - Top_10_occurring_words')
+            'User | No._of_tweets_from_user_in_last_5_min | No._of_links_in_user_tweets | (Order_of_resolved_domains_sorted_by_count_descending, count) | Total_no._of_unique_words_in_tweet | (Top_10_occurring_words_sorted_descending, count)')
+        print('-' * 145)
         for i in items:
-            print(i[0].ljust(15)+' - ', ' - '.join([str(j) for j in i[2:]]))
-        print(len(items))
+            print(i[0].ljust(15)+' | ', ' | '.join([str(j)
+                                                    for j in i[2:]]), end='\n\n')
+        print(len(items), 'users in last 5 minutes')
         print('#'*145)
     except KeyboardInterrupt:
         os.system('pkill -9 python')
